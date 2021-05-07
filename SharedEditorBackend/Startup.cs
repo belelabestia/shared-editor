@@ -30,7 +30,8 @@ namespace SharedEditorBackend
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ConnectionStateHub>("/just-open-session");
+                endpoints.MapHub<ConnectionStateHub>("/connection-state");
+                endpoints.MapHub<UserActionHub>("/user-notification");
             });
         }
     }
