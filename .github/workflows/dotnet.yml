@@ -41,5 +41,5 @@ jobs:
         SSHPASS: ${{ secrets.SSH_PASSWORD }}
         USER_HOST: root@belelabestia.it
       run: |
-        sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm /var/www/shared-editor/nightly/backend/*
+        sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/nightly/backend/*
         sshpass -e scp -o StrictHostKeyChecking=no -r bin/Nightly/net5.0/linux-x64/publish/* root@belelabestia.it:/var/www/shared-editor/nightly/backend/
