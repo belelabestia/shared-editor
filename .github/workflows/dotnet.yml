@@ -33,4 +33,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Publish
-      run:  dotnet publish -c Nightly -r linux-x64
+      run:  dotnet publish -c Nightly -r linux-x64 --no-self-contained
+    - name: Install sshpass
+      run: sudo apt install sshpass
+    - name: Push to Sissi
+      run: scp . root@belelabestia.it:/var/www/shared-editor/nightly/backend
