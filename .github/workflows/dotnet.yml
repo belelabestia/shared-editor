@@ -40,4 +40,6 @@ jobs:
       working-directory: SharedEditorBackend/bin/Nightly/net5.0/linux-x64/publish/
       env:
         SSHPASS: ${{ secrets.SSH_PASSWORD }}
-      run: sshpass -e scp -r * root@belelabestia.it:/var/www/shared-editor/nightly/backend/
+      run: |
+        pwd
+        sshpass -e scp -r * root@belelabestia.it:/var/www/shared-editor/nightly/backend/
