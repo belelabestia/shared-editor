@@ -25,7 +25,7 @@ jobs:
     needs: build
     defaults:
       run:
-        working-directory: SharedEditionBackend
+        working-directory: SharedEditorBackend
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -33,4 +33,4 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Publish
-      run: dotnet publish -c Nightly
+      run:  dotnet publish -c Nightly -r linux-x64
