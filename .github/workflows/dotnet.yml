@@ -37,9 +37,6 @@ jobs:
     - name: Install sshpass
       run: sudo apt install sshpass
     - name: Push to Sissi
-      working-directory: SharedEditorBackend/bin/Nightly/net5.0/linux-x64/publish/
       env:
         SSHPASS: ${{ secrets.SSH_PASSWORD }}
-      run: |
-        pwd
-        sshpass -e scp -r * root@belelabestia.it:/var/www/shared-editor/nightly/backend/
+      run: sshpass -e scp -o StrictHostKeyChecking=no -r bin/Nightly/net5.0/linux-x64/publish/* root@belelabestia.it:/var/www/shared-editor/nightly/backend/
