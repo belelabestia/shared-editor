@@ -6,11 +6,8 @@ namespace SharedEditorBackend.Services
 {
     public class ConnectionService
     {
-        private BehaviorSubject<bool> connected = new(false);
-        public IObservable<bool> Connected => connected
-            .AsObservable()
-            .DistinctUntilChanged();
-
+        private Subject<bool> connected = new();
+        public IObservable<bool> Connected => connected.AsObservable();
         public void SetConnectionState(bool state) => this.connected.OnNext(state);
     }
 }

@@ -9,13 +9,20 @@ import { UserNotificationService } from './services/user-notification.service';
 })
 export class AppComponent {
   constructor(
-    connectionService: ConnectionService,
-    userNotificationService: UserNotificationService
+    private connectionService: ConnectionService,
+    private userNotificationService: UserNotificationService
   ) {
-    connectionService.connection.subscribe(console.log);
-    connectionService.connectTo('/connection-state');
+    this.registerEventLoggers();
+    this.connectServices();
+  }
 
-    userNotificationService.userJoined.subscribe(() => console.log('yaay!'));
-    userNotificationService.userLeft.subscribe(() => console.log('uff'));
+  private registerEventLoggers(): void {
+    this.userNotificationService.userJoined.subscribe(() => console.log('yaay!'));
+    this.userNotificationService.userLeft.subscribe(() => console.log('uff'));
+  }
+
+  private connectServices(): void {
+    this.connectionService.connect().then(() => console.log('state hub connected'));
+    this.userNotificationService.connect();
   }
 }

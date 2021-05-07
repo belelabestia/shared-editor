@@ -3,6 +3,7 @@ import { ConnectionService } from './connection.service';
 import { filter, map } from 'rxjs/operators';
 import { BehaviorSubject, pipe, Subject } from 'rxjs';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 type UserJoined = 'USER_JOINED';
 type UserLeft = 'USER_LEFT';
@@ -27,23 +28,23 @@ export class UserNotificationService {
   userJoined = this.userActionSubject.asObservable().pipe(filter(isUserJoined));
   userLeft = this.userActionSubject.asObservable().pipe(filter(isUserLeft));
 
-  constructor(private connectionService: ConnectionService) {
-    this.subscribeToConnection();
+  constructor(private connectionService: ConnectionService) { }
+
+  connect(): void {
+    this.registerMethods();
   }
 
-  connect() {
-    this.connectionService.connectTo('/user-notification');
+  disconnect(): void {
+    this.unregisterMethods();
   }
 
-  private subscribeToConnection() {
-    this.connectionService.connection
-      .pipe(
-        takeIfDefined,
-        unwrap
-      )
-      .subscribe(conn => {
-        conn.on(USER_JOINED, () => this.userActionSubject.next(USER_JOINED));
-        conn.on(USER_LEFT, () => this.userActionSubject.next(USER_LEFT));
-      });
+  private registerMethods(): void {
+    this.connectionService.connection.on(USER_JOINED, () => this.userActionSubject.next(USER_JOINED));
+    this.connectionService.connection.on(USER_LEFT, () => this.userActionSubject.next(USER_LEFT));
+  }
+
+  private unregisterMethods(): void {
+    this.connectionService.connection.off(USER_JOINED);
+    this.connectionService.connection.off(USER_LEFT);
   }
 }

@@ -1,18 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConnectionService {
-  private connectionSubject = new BehaviorSubject<HubConnection | null>(null);
-  public readonly connection = this.connectionSubject.asObservable();
+  readonly connection = this.getConnectionTo('http://localhost:5000/connection-state');
 
   constructor(private hubConnectionBuilder: HubConnectionBuilder) { }
+  
+  connect(): Promise<void> {
+    return this.connection.start();
+  }
 
-  connectTo(url: string) {
-    const connection = this.hubConnectionBuilder.withUrl('/connection-state').build();
-    this.connectionSubject.next(connection);
+  disconnect(): Promise<void> {
+    return this.connection.stop();
+  }
+
+  private getConnectionTo(url: string): HubConnection {
+    return this.hubConnectionBuilder.withUrl(url).build();
   }
 }

@@ -10,9 +10,7 @@ namespace SharedEditorBackend.Hubs
         private ConnectionService connectionService;
         public override Task OnConnectedAsync() => Task.Run(SetConnected);
         public override Task OnDisconnectedAsync(Exception exception) => Task.Run(SetDisconnected);
-
-        public ConnectionStateHub(ConnectionService connectionService) => this.connectionService = connectionService;
-
+        public ConnectionStateHub(ConnectionService connectionService, UserActionNotificationService _) => this.connectionService = connectionService;
         private void SetConnected() => connectionService.SetConnectionState(true);
         private void SetDisconnected() => connectionService.SetConnectionState(false);
     }
