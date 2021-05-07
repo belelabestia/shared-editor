@@ -33,6 +33,7 @@ jobs:
         touch test-file
         sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/nightly/backend/test-file
         sshpass -e scp -o StrictHostKeyChecking=no test-file $USER_HOST:/var/www/shared-editor/nightly/backend/
+        sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/nightly/backend/test-file
   deploy:
     runs-on: ubuntu-latest
     needs: [test-build, test-push]
