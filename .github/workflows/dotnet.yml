@@ -39,4 +39,7 @@ jobs:
     - name: Push to Sissi
       env:
         SSHPASS: ${{ secrets.SSH_PASSWORD }}
-      run: sshpass -e scp -o StrictHostKeyChecking=no -r bin/Nightly/net5.0/linux-x64/publish/* root@belelabestia.it:/var/www/shared-editor/nightly/backend/
+        USER_HOST: root@belelabestia.it
+      run: |
+        sshpass -e ssh $USER_HOST rm /var/www/shared-editor/nightly/backend/*
+        sshpass -e scp -o StrictHostKeyChecking=no -r bin/Nightly/net5.0/linux-x64/publish/* root@belelabestia.it:/var/www/shared-editor/nightly/backend/
