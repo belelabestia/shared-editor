@@ -58,7 +58,7 @@ jobs:
         env:
           SSHPASS: ${{ secrets.SSH_PASSWORD }}
           USER_HOST: root@belelabestia.it
-        working-directory: shared-editor-frontend/dist/shared-editor-frontend
+        working-directory: shared-editor-frontend
         run: |
           sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/nightly/frontend/*
-          sshpass -e scp -o StrictHostKeyChecking=no -r bin/Nightly/net5.0/linux-x64/publish/* $USER_HOST:/var/www/shared-editor/nightly/frontend/
+          sshpass -e scp -o StrictHostKeyChecking=no -r /dist/shared-editor-frontend/* $USER_HOST:/var/www/shared-editor/nightly/frontend/
