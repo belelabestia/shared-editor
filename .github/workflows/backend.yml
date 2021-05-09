@@ -47,7 +47,7 @@ jobs:
         with:
           dotnet-version: 5.0.x
       - name: Publish
-        run: dotnet publish -c Nightly -r linux-x64 --self-contained
+        run: dotnet publish -c dev -r linux-x64 --self-contained
       - name: Install sshpass
         run: sudo apt install sshpass
       - name: Push to Sissi

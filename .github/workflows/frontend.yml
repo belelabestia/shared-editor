@@ -1,4 +1,4 @@
-name: nightly-frontend
+name: dev-frontend
 
 on:
   push:
