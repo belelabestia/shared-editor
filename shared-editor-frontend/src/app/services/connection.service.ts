@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConnectionService {
-  readonly connection = this.getConnectionTo('http://localhost:5000/connection-state');
+  readonly connection = this.getConnectionTo('connection-state');
 
   constructor(private hubConnectionBuilder: HubConnectionBuilder) { }
   
@@ -18,6 +19,7 @@ export class ConnectionService {
   }
 
   private getConnectionTo(url: string): HubConnection {
-    return this.hubConnectionBuilder.withUrl(url).build();
+    const urlWithPrefix = environment.endpointPrefixes.signalr + url;
+    return this.hubConnectionBuilder.withUrl(urlWithPrefix).build();
   }
 }
