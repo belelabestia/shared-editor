@@ -1,6 +1,6 @@
+import { baseConf } from './base.conf';
+
 export const environment = {
-  production: false,
-  endpointPrefixes: {
-    signalr: 'signalr/'
-  }
+  ...baseConf,
+  production: false
 };
