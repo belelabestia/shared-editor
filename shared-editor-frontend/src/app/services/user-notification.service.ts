@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConnectionService } from './connection.service';
-import { filter, map } from 'rxjs/operators';
-import { BehaviorSubject, pipe, Subject } from 'rxjs';
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { filter } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 type UserJoined = 'USER_JOINED';
 type UserLeft = 'USER_LEFT';
@@ -14,11 +12,6 @@ const USER_LEFT: UserLeft = 'USER_LEFT';
 
 const isUserJoined = (action: UserAction) => action == USER_JOINED;
 const isUserLeft = (action: UserAction) => action == USER_LEFT;
-const notNull = <T>(param: T | null | undefined) => param != null && param != undefined;
-const toNotNull = <T>(param: T | null | undefined) => param as T;
-
-const takeIfDefined = pipe(filter(notNull));
-const unwrap = pipe(map(toNotNull));
 
 @Injectable({
   providedIn: 'root'
