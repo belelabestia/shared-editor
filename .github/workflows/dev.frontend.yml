@@ -21,7 +21,7 @@ jobs:
       - name: Build Angular
         run: |
           npm i
-          npx ng build --prod
+          npx ng build
   test-push:
     runs-on: ubuntu-latest
     env:
@@ -51,7 +51,7 @@ jobs:
       - name: Publish
         run: |
           npm i
-          npx ng build --prod
+          npx ng build
       - name: Install sshpass
         run: sudo apt install sshpass
       - name: Push to Sissi

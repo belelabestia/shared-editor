@@ -1,0 +1,64 @@
+name: release-frontend
+
+on:
+  push:
+    branches: [release]
+  pull_request:
+    branches: [release]
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: shared-editor-frontend
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+      - name: Build Angular
+        run: |
+          npm i
+          npx ng build --prod
+  test-push:
+    runs-on: ubuntu-latest
+    env:
+      SSHPASS: ${{ secrets.SSH_PASSWORD }}
+      USER_HOST: root@belelabestia.it
+    steps:
+      - name: Install sshpass
+        run: sudo apt install sshpass
+      - name: Transfer file
+        run: |
+          touch test-file
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/release/frontend/test-file
+          sshpass -e scp -o StrictHostKeyChecking=no test-file $USER_HOST:/var/www/shared-editor/release/frontend/
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/release/frontend/test-file
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test-build, test-push]
+    defaults:
+      run:
+        working-directory: shared-editor-frontend
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+      - name: Publish
+        run: |
+          npm i
+          npx ng build --prod
+      - name: Install sshpass
+        run: sudo apt install sshpass
+      - name: Push to Sissi
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+          USER_HOST: root@belelabestia.it
+        working-directory: shared-editor-frontend
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/release/frontend/*
+          sshpass -e scp -o StrictHostKeyChecking=no -r dist/shared-editor-frontend/* $USER_HOST:/var/www/shared-editor/release/frontend/

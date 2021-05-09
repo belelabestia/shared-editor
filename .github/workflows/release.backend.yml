@@ -1,0 +1,60 @@
+name: release-backend
+
+on:
+  push:
+    branches: [release]
+  pull_request:
+    branches: [release]
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SharedEditorBackend
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Build
+        run: dotnet build
+  test-push:
+    runs-on: ubuntu-latest
+    env:
+      SSHPASS: ${{ secrets.SSH_PASSWORD }}
+      USER_HOST: root@belelabestia.it
+    steps:
+      - name: Install sshpass
+        run: sudo apt install sshpass
+      - name: Transfer file
+        run: |
+          touch test-file
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/release/backend/test-file
+          sshpass -e scp -o StrictHostKeyChecking=no test-file $USER_HOST:/var/www/shared-editor/release/backend/
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/release/backend/test-file
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test-build, test-push]
+    defaults:
+      run:
+        working-directory: SharedEditorBackend
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Publish
+        run: dotnet publish -c release -r linux-x64 --self-contained
+      - name: Install sshpass
+        run: sudo apt install sshpass
+      - name: Push to Sissi
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+          USER_HOST: root@belelabestia.it
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/release/backend/*
+          sshpass -e scp -o StrictHostKeyChecking=no -r bin/release/net5.0/linux-x64/publish/* $USER_HOST:/var/www/shared-editor/release/backend/
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST systemctl restart kestrel-shared-editor.release.service
