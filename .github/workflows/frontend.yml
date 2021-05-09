@@ -2,9 +2,9 @@ name: nightly-frontend
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
   pull_request:
-    branches: [main]
+    branches: [dev]
 
 jobs:
   test-build:
@@ -33,9 +33,9 @@ jobs:
       - name: Transfer file
         run: |
           touch test-file
-          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/nightly/frontend/test-file
-          sshpass -e scp -o StrictHostKeyChecking=no test-file $USER_HOST:/var/www/shared-editor/nightly/frontend/
-          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/nightly/frontend/test-file
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/dev/frontend/test-file
+          sshpass -e scp -o StrictHostKeyChecking=no test-file $USER_HOST:/var/www/shared-editor/dev/frontend/
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/dev/frontend/test-file
   deploy:
     runs-on: ubuntu-latest
     needs: [test-build, test-push]
@@ -60,5 +60,5 @@ jobs:
           USER_HOST: root@belelabestia.it
         working-directory: shared-editor-frontend
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/nightly/frontend/*
-          sshpass -e scp -o StrictHostKeyChecking=no -r dist/shared-editor-frontend/* $USER_HOST:/var/www/shared-editor/nightly/frontend/
+          sshpass -e ssh -o StrictHostKeyChecking=no $USER_HOST rm -f /var/www/shared-editor/dev/frontend/*
+          sshpass -e scp -o StrictHostKeyChecking=no -r dist/shared-editor-frontend/* $USER_HOST:/var/www/shared-editor/dev/frontend/
