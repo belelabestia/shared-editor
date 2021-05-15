@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SharedEditorBackend.Features;
 using SharedEditorBackend.Shared;
 
 namespace SharedEditorBackend
@@ -39,7 +40,7 @@ namespace SharedEditorBackend
         private Func<IServiceProvider, Radiator<T>> RadiatorFactory<T>(string endpoint) => (IServiceProvider provider) =>
         {
             var subject = provider.GetService<Subject<T>>();
-            var context = provider.GetService<IHubContext<ObserverHub<T>>>();
+            var context = provider.GetService<IHubContext<Trigger<T>>>();
 
             return new Radiator<T>(subject, context, endpoint);
         };

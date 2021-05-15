@@ -3,9 +3,9 @@ using System;
 using SharedEditorBackend.Shared;
 using System.Reactive.Subjects;
 
-namespace SharedEditorBackend
+namespace SharedEditorBackend.Features
 {
-    public class UserActionHub : ObserverHub<UserAction>
+    public class UserActionHub : Trigger<UserAction>
     {
         public override Task OnConnectedAsync() => Task.Run(UserJoined);
         public override Task OnDisconnectedAsync(Exception exception) => Task.Run(UserLeft);

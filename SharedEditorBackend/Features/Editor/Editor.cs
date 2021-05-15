@@ -1,4 +1,4 @@
-namespace SharedEditorBackend
+namespace SharedEditorBackend.Features
 {
     public record Editor
     {

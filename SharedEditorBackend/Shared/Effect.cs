@@ -7,11 +7,11 @@ namespace SharedEditorBackend.Shared
     public abstract class Effect<Model>
     {
         protected Subject<Model> subject;
-        protected IHubContext<ObserverHub<Model>> context;
+        protected IHubContext<Trigger<Model>> context;
 
         public Effect(
             Subject<Model> subject,
-            IHubContext<ObserverHub<Model>> context
+            IHubContext<Trigger<Model>> context
         ) => (this.subject, this.context) = (subject, context);
 
         public abstract void Activate();
