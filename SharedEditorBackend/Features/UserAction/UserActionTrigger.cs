@@ -5,11 +5,11 @@ using System.Reactive.Subjects;
 
 namespace SharedEditorBackend.Features
 {
-    public class UserActionHub : Trigger<UserAction>
+    public class UserActionTrigger : Trigger<UserAction>
     {
         public override Task OnConnectedAsync() => Task.Run(UserJoined);
         public override Task OnDisconnectedAsync(Exception exception) => Task.Run(UserLeft);
-        public UserActionHub(Subject<UserAction> subject) : base(subject) { }
+        public UserActionTrigger(Subject<UserAction> subject) : base(subject) { }
         private void UserJoined() => OnModelChange(UserAction.Joined);
         private void UserLeft() => OnModelChange(UserAction.Left);
     }

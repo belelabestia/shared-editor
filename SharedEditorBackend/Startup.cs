@@ -1,8 +1,6 @@
 using System;
 using System.Reactive.Subjects;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,28 +22,34 @@ namespace SharedEditorBackend
             services.AddSingleton<Subject<Editor>>();
             services.AddSingleton<Subject<UserAction>>();
 
-            services.AddSingleton<Radiator<UserAction>>(RadiatorFactory<UserAction>(appSettings.Endpoints.UserAction));
-            services.AddSingleton<Radiator<Editor>>(RadiatorFactory<Editor>(appSettings.Endpoints.Editor));
+            services.AddScoped<Trigger<UserAction>, UserActionTrigger>();
+            
+            services.AddSingleton<Radiator<UserAction>>(GetRadiatorFactory<UserAction>(appSettings.Endpoints.UserAction));
+            services.AddSingleton<Radiator<Editor>>(GetRadiatorFactory<Editor>(appSettings.Endpoints.Editor));
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            app.UseRouting();
-            app.UsePathBase(appSettings.Endpoints.PathBase);
-
-            app.UseEndpoints(endpoints =>
+            app.Map(appSettings.Endpoints.Prefix, app =>
             {
-                endpoints.MapHub<UserActionHub>(appSettings.Endpoints.UserAction);
-                endpoints.MapHub<Hub<Editor>>(appSettings.Endpoints.Editor);
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapHub<Trigger<UserAction>>(appSettings.Endpoints.UserAction);
+                    endpoints.MapHub<Trigger<Editor>>(appSettings.Endpoints.Editor);
+                });
             });
+
+            app.ApplicationServices.GetService<Radiator<UserAction>>().Activate();
+            app.ApplicationServices.GetService<Radiator<Editor>>().Activate();
         }
 
-        private Func<IServiceProvider, Radiator<T>> RadiatorFactory<T>(string endpoint) => (IServiceProvider provider) =>
+        private Func<IServiceProvider, Radiator<T>> GetRadiatorFactory<T>(string method) => (IServiceProvider provider) =>
         {
             var subject = provider.GetService<Subject<T>>();
             var context = provider.GetService<IHubContext<Trigger<T>>>();
 
-            return new Radiator<T>(subject, context, endpoint);
+            return new Radiator<T>(subject, context, method);
         };
     }
 }
