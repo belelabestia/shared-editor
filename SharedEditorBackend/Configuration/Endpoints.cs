@@ -2,7 +2,8 @@ namespace SharedEditorBackend.Configuration
 {
     public class Endpoints
     {
-        public Frontend Frontend { get; set; }
-        public Backend Backend { get; set; }
+        public string PathBase { get; set; }
+        public string UserAction { get; set; }
+        public string Editor { get; set; }
     }
 }
