@@ -1,52 +1,55 @@
+using System;
+using System.Reactive.Subjects;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SharedEditorBackend.Hubs;
-using SharedEditorBackend.Services;
+using SharedEditorBackend.Configuration;
+using SharedEditorBackend.Features;
+using SharedEditorBackend.Shared;
 
 namespace SharedEditorBackend
 {
     public class Startup
     {
-        private IConfiguration configuration;
-        public Startup(IConfiguration configuration)
-        {
-            this.configuration = configuration;
-        }
+        private AppSettings appSettings;
+        public Startup(IConfiguration configuration) => appSettings = configuration.Get<AppSettings>();
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
             services.AddSignalR();
-            services.AddSingleton<ConnectionService>();
-            services.AddSingleton<UserActionNotificationService>();
+
+            services.AddSingleton<Subject<Editor>>();
+            services.AddSingleton<Subject<UserAction>>();
+
+            services.AddScoped<Trigger<UserAction>, UserActionTrigger>();
+            
+            services.AddSingleton<Radiator<UserAction>>(GetRadiatorFactory<UserAction>(appSettings.Endpoints.UserAction));
+            services.AddSingleton<Radiator<Editor>>(GetRadiatorFactory<Editor>(appSettings.Endpoints.Editor));
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            app.UseCors(options =>
+            app.Map(appSettings.Endpoints.Prefix, app =>
             {
-                options.WithOrigins("http://localhost:4200");
-                options.AllowCredentials();
-                options.AllowAnyHeader();
-                options.AllowAnyMethod();
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapHub<Trigger<UserAction>>(appSettings.Endpoints.UserAction);
+                    endpoints.MapHub<Trigger<Editor>>(appSettings.Endpoints.Editor);
+                });
             });
 
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<ConnectionStateHub>(GetSignalRUrl("ConnectionState"));
-            });
+            app.ApplicationServices.GetService<Radiator<UserAction>>().Activate();
+            app.ApplicationServices.GetService<Radiator<Editor>>().Activate();
         }
 
-        private string GetSignalRUrl(string endpointKey)
+        private Func<IServiceProvider, Radiator<T>> GetRadiatorFactory<T>(string method) => (IServiceProvider provider) =>
         {
-            var signalrPrefix = configuration["Endpoints:SignalRPrefix"];
-            var endpoint = configuration[$"Endpoints:{endpointKey}"];
+            var subject = provider.GetService<Subject<T>>();
+            var context = provider.GetService<IHubContext<Trigger<T>>>();
 
-            return signalrPrefix + endpoint;
-        }
+            return new Radiator<T>(subject, context, method);
+        };
     }
 }
