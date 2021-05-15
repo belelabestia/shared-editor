@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SharedEditorBackend.Configuration;
 using SharedEditorBackend.Features;
 using SharedEditorBackend.Shared;
 
@@ -12,8 +13,8 @@ namespace SharedEditorBackend
 {
     public class Startup
     {
-        private Endpoints endpoints;
-        public Startup(IConfiguration configuration) => this.endpoints = configuration.GetSection("Endpoints").Get<Endpoints>();
+        private AppSettings appSettings;
+        public Startup(IConfiguration configuration) => appSettings = configuration.Get<AppSettings>();
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -22,8 +23,8 @@ namespace SharedEditorBackend
             services.AddSingleton<Subject<Editor>>();
             services.AddSingleton<Subject<UserAction>>();
 
-            services.AddSingleton<Radiator<UserAction>>(RadiatorFactory<UserAction>(endpoints.Frontend.UserAction));
-            services.AddSingleton<Radiator<Editor>>(RadiatorFactory<Editor>(endpoints.Frontend.Editor));
+            services.AddSingleton<Radiator<UserAction>>(RadiatorFactory<UserAction>(appSettings.Endpoints.Frontend.UserAction));
+            services.AddSingleton<Radiator<Editor>>(RadiatorFactory<Editor>(appSettings.Endpoints.Frontend.Editor));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -32,8 +33,8 @@ namespace SharedEditorBackend
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<UserActionHub>(this.endpoints.Backend.SignalRPrefix + this.endpoints.Backend.UserAction);
-                endpoints.MapHub<Hub<Editor>>(this.endpoints.Backend.SignalRPrefix + this.endpoints.Backend.Editor);
+                endpoints.MapHub<UserActionHub>(appSettings.Endpoints.Backend.SignalRPrefix + appSettings.Endpoints.Backend.UserAction);
+                endpoints.MapHub<Hub<Editor>>(appSettings.Endpoints.Backend.SignalRPrefix + appSettings.Endpoints.Backend.Editor);
             });
         }
 
