@@ -1,4 +1,8 @@
 namespace SharedEditorBackend.Features
 {
-    public enum UserAction { Joined, Left }
+    public enum UserAction
+    {
+        Joined,
+        Left
+    }
 }
