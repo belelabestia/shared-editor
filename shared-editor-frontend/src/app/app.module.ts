@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { connectionProvider, UserActionConnection, EditorConnection } from './shared/connection';
 
 @NgModule({
   declarations: [
@@ -12,10 +11,6 @@ import { connectionProvider, UserActionConnection, EditorConnection } from './sh
   imports: [
     BrowserModule,
     AppRoutingModule
-  ],
-  providers: [
-    connectionProvider(UserActionConnection, 'signalr/user-action'),
-    connectionProvider(EditorConnection, 'signalr/editor')
   ],
   bootstrap: [AppComponent]
 })
