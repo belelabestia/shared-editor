@@ -3,12 +3,14 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { EditorTextPipe } from './features/editor';
 import { UserActionPipe } from './features/user-action';
 
 @NgModule({
   declarations: [
     AppComponent,
-    UserActionPipe
+    UserActionPipe,
+    EditorTextPipe
   ],
   imports: [
     BrowserModule,
