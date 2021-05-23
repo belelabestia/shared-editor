@@ -10,7 +10,7 @@ namespace SharedEditorBackend.Features
         public override Task OnConnectedAsync() => Task.Run(UserJoined);
         public override Task OnDisconnectedAsync(Exception exception) => Task.Run(UserLeft);
         public UserActionTrigger(Subject<UserAction> subject) : base(subject) { }
-        private void UserJoined() => OnModelChange(UserAction.Joined);
-        private void UserLeft() => OnModelChange(UserAction.Left);
+        private void UserJoined() => OnChange(UserAction.Joined);
+        private void UserLeft() => OnChange(UserAction.Left);
     }
 }

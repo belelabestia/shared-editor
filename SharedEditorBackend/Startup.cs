@@ -1,7 +1,4 @@
-using System;
-using System.Reactive.Subjects;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SharedEditorBackend.Configuration;
@@ -19,13 +16,13 @@ namespace SharedEditorBackend
         {
             services.AddSignalR();
 
-            services.AddSingleton<Subject<Editor>>();
-            services.AddSingleton<Subject<UserAction>>();
+            services.AddSubject<Editor>();
+            services.AddSubject<UserAction>();
+
+            services.AddRadiator<UserAction>(appSettings.Endpoints.UserAction);
+            services.AddRadiator<Editor>(appSettings.Endpoints.Editor);
 
             services.AddScoped<Trigger<UserAction>, UserActionTrigger>();
-            
-            services.AddSingleton<Radiator<UserAction>>(GetRadiatorFactory<UserAction>(appSettings.Endpoints.UserAction));
-            services.AddSingleton<Radiator<Editor>>(GetRadiatorFactory<Editor>(appSettings.Endpoints.Editor));
         }
 
         public void Configure(IApplicationBuilder app)
@@ -40,16 +37,8 @@ namespace SharedEditorBackend
                 });
             });
 
-            app.ApplicationServices.GetService<Radiator<UserAction>>().Activate();
-            app.ApplicationServices.GetService<Radiator<Editor>>().Activate();
+            app.InitRadiator<UserAction>();
+            app.InitRadiator<Editor>();
         }
-
-        private Func<IServiceProvider, Radiator<T>> GetRadiatorFactory<T>(string method) => (IServiceProvider provider) =>
-        {
-            var subject = provider.GetService<Subject<T>>();
-            var context = provider.GetService<IHubContext<Trigger<T>>>();
-
-            return new Radiator<T>(subject, context, method);
-        };
     }
 }

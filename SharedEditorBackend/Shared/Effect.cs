@@ -1,12 +1,12 @@
+using System;
 using System.Reactive.Subjects;
 
 namespace SharedEditorBackend.Shared
 {
-    public abstract class Effect<Model>
+    public abstract class Effect<Model> : IDisposable
     {
         protected Subject<Model> subject;
         public Effect(Subject<Model> subject) => this.subject = subject;
-        public abstract void Activate();
-        public abstract void Deactivate();
+        public abstract void Dispose();
     }
 }
